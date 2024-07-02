@@ -11,7 +11,7 @@ select first_name||' '||last_name  as full_name,hire_date, commission_pct, email
 from employees where salary > 11000 order  by 1 desc;
 
 Write a query in SQL to display the first and last name, and salary for those employees whose first
-name is ending with the letter ìmî and they have been hired before June 5th, 2010.
+name is ending with the letter ‚Äúm‚Äù and they have been hired before June 5th, 2010.
 
 select first_name, last_name, salary from employees where first_name like '%m' and hire_date< '05-jun-2010';
 
@@ -27,7 +27,7 @@ select first_name, last_name , hire_date from employees where hire_date  like '%
 
 select * from employees where hire_date > '31-DEC-07' or salary < 10000;
 
-/*HOMEWORK
+/*
 Display first name and last name as full name, salary, commission pct, and hire date for employees
 with salary less than 10000.
 */
@@ -68,7 +68,7 @@ select * from employees where hire_date> '01-jan-2008';
 select * from employees where first_name like 'S%' or last_name like 'S%';
 select first_name, last_name from employees where lower (first_name) like 's%' or lower (last_name) like 's%';
 
---Display the length of first name for employees where last name contain character ëbí after 3rd  position.
+--Display the length of first name for employees where last name contain character ‚Äòb‚Äô after 3rd  position.
 
 select length(first_name),first_name,last_name from employees where last_name like '___b%';
 
