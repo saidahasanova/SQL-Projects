@@ -110,7 +110,7 @@ WHERE
     GROUP BY DEPARTMENT_ID HAVING COUNT(*) >5;
 
 /*
-10.Change second letter of employees’ names with the last letter and display.
+10.Change second letter of employeesâ€™ names with the last letter and display.
 */
 
 
@@ -124,7 +124,7 @@ FIRST_NAME FROM EMPLOYEES;
 SELECT COUNT(*),DEPARTMENT_ID, MAX(SALARY) FROM EMPLOYEES 
 GROUP BY DEPARTMENT_ID HAVING MAX(SALARY)>5000;
 
-----HOMEWORK 2
+
 --Display employees who joined in the month of May.
 SELECT FIRST_NAME, HIRE_DATE  FROM EMPLOYEES 
 WHERE EXTRACT (MONTH FROM HIRE_DATE) = '05';
