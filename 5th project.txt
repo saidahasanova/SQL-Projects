@@ -1,0 +1,54 @@
+﻿/*
+Customer cədvəlindən istifadə edərək virtual formada aşağıdakı sütunları formalaşdıracaq select ifadəsini yazın.(fiziki olaraq cədvələ sütun əlavə etməyin)
+
+
+1.CUSTOMER_CREATION_STATUS=Əgər müştəri son bir ildə yaradılıbsa o zaman yeni müştəri qalan hallarda köhnə müştəri olaraq qeyd olunsun.
+2.CONTACT_CHANNEL=Müştəri ilə əlaqə yaratmaq üçün əgər müştərinin mobil nömrəsi varsa və yaşı 30-dan azdırsa yalnız həftə sonu zəng etmək olar yazsın
+əgər nömrəsi yoxdur amma normal(tərkibində@ simvolu varsa) emaili varsa həftə içi email göndərmək olar yazsın
+əgər nömrəsi və emaili yoxdursa o zaman balance məbləği 200-dən azdırsa müştəri ilə 6 ay sonra əlaqə məlumatları yoxlanılsın yazsın,
+200-dən çoxdursa 400-dən azıdrsa 3 ay sonra əlaqə məlumatları yoxlanılsın yazsın,
+400-dən çoxdursa bir həftə sonra əlaqə məlumatları yoxlanılsın yazsın.
+3.SEGMENT=Əgər müştərinin branch codu 1 və 3-dürsə yaxud korporativ müştəridirsə və yaranma illəri 2017 və 2020-dirsə bu müştərilər vip qeyd olunsun.
+digər hallarda müştərinin qeydiyyat tarixi həftənin birinci günündən fərqlidirsə yaxud ay olaraq yanvardan fərqlidirsə sadə qeyd olunsun.
+4.D_ADDRESS sütununa görə filter edilsin ki,yalnız tərkibində ə,r,z yaxud da null olan müştərilər əks olunsun.
+5.Yuxarıda qeyd edilən sütunlardan başqa bu sütunları formalaşdırmaq üçün lazım olan bütün sütunlar da onlarla bərabər yekun nəticədə əks olunsun.
+*/
+
+
+--select  TO_CHAR(sysdate, 'Day') from dual
+
+
+
+
+SELECT 
+    CUSTOMER_ID, 
+    BIRTH_DATE, 
+    GROUP_CODE,        
+    BRANCH_CODE, 
+    PHONE_NUMBER,        
+    EMAIL, 
+    D_ADDRESS,        
+    CREATION_DATE, 
+    BALANCE, 
+    TRUNC(MONTHS_BETWEEN (SYSDATE, BIRTH_DATE)/12) AGE,
+    --CASE WHEN EXTRACT(YEAR FROM CREATION_DATE ) = EXTRACT (YEAR FROM SYSDATE)
+   -- CASE WHEN CREATION_DATE>sysdate-365
+   case when months_between(CREATION_DATE,sysdate)<=12
+    THEN 'Yeni_müştəri' ELSE 'Köhnə_müştəri' END customer_creation_status,
+    
+    CASE WHEN BRANCH_CODE IN ('1','3') OR (GROUP_CODE = 'CORP' AND (EXTRACT(YEAR FROM CREATION_DATE) in (2017,2020) )) THEN 'VIP' 
+              WHEN EXTRACT(MONTH FROM CREATION_DATE) <> 1 AND 
+         TO_CHAR(CREATION_DATE, 'D') <> 2 THEN 'Sadə' END SEGMENT_ ,
+    
+    CASE 
+        WHEN (PHONE_NUMBER IS NOT NULL AND TRUNC(MONTHS_BETWEEN(SYSDATE, BIRTH_DATE) / 12) < 30) THEN 'Yalnız həftə sonu zəng etmək olar'
+        WHEN (PHONE_NUMBER IS NULL and LOWER(EMAIL) LIKE '%@%') THEN 'Həftə içi email göndərmək olar'
+        WHEN (PHONE_NUMBER IS NULL AND EMAIL IS NULL) THEN
+            CASE 
+                WHEN BALANCE < 200 THEN 'Müştəri ilə 6 ay sonra əlaqə məlumatları yoxlanılsın yazsın'
+                WHEN BALANCE BETWEEN 200 AND 400 THEN '3 ay sonra əlaqə məlumatları yoxlanılsın'
+                WHEN BALANCE > 400 THEN 'Bir həftə sonra əlaqə məlumatları yoxlanılsın'
+            END
+    END AS CONTACT_CHANNEL
+    FROM CUSTOMER t1
+WHERE LOWER(D_ADDRESS) LIKE ('%ə%') or LOWER(D_ADDRESS) LIKE ('%r%') or LOWER(D_ADDRESS) LIKE ('%z%') or D_ADDRESS is NULL;
